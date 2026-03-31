@@ -1,0 +1,13 @@
+{
+    "name": "veribenim/wordpress",
+    "description": "Veribenim KVKK/GDPR çerez onayı — WordPress Plugin",
+    "keywords": ["kvkk", "gdpr", "cookie", "consent", "veribenim", "wordpress"],
+    "homepage": "https://veribenim.com",
+    "license": "MIT",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": "^8.1"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
