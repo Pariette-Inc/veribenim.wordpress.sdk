@@ -63,7 +63,7 @@ Veribenim sadece bir çerez eklentisi değil, **tam kapsamlı bir KVKK/GDPR uyum
 | **Veri İhlali Yönetimi** | GDPR Md.33: 72 saat countdown, risk seviyesi, otorite bildirim kaydı |
 | **VERBİS / RoPA Export** | KVKK VERBİS kaydı ve GDPR Md.30 RoPA: CSV/JSON export, 17 alan |
 | **Politika Yönetimi** | Gizlilik politikası, çerez politikası, KVKK aydınlatma — çoklu dil, PDF/HTML export |
-| **Uyumluluk Skoru** | 17 kural, 5 kategori, A-F notlandırma, düzeltme önerileri |
+| **Uyumluluk Skoru** | 22 kural, 5 kategori, A-F notlandırma, düzeltme önerileri |
 | **Form Rızası Takibi** | İletişim, üyelik formlarındaki KVKK onayını kayıt altına alma |
 | **Webhook Sistemi** | 7 olay tipi, HMAC-SHA256, Slack/Teams/n8n entegrasyonu |
 | **Çerez Tarayıcı** | 50+ bilinen tracker otomatik tespiti |
@@ -75,6 +75,12 @@ Veribenim sadece bir çerez eklentisi değil, **tam kapsamlı bir KVKK/GDPR uyum
 | **Doküman Şablonları** | 10 hazır KVKK/GDPR şablonu, değişken sistemi, çoklu dil, versiyon takibi |
 | **Rıza Versiyonlama** | Onay metni versiyon takibi, yeniden onay mekanizması, versiyon karşılaştırma |
 | **AI Asistan** | RAG tabanlı KVKK/GDPR bilgi asistanı |
+| **Meşru Menfaat Değerlendirmesi (LIA)** | KVK Kurul rehberi uyumlu 3-adım balans testi: Amaç → Zorunluluk → Dengeleme |
+| **VERBİS Kayıt Asistanı** | KVKK Md.16: 50+ çalışan eşiği kontrolü, veri işleme aktivitesi kayıt ve export |
+| **Rıza Yenileme** | KVK Kurul Çerez Rehberi 2022: 12 aylık zorunlu yenileme, otomatik banner tetikleme |
+| **Rızayı Geri Çekme** | KVKK Md.11/1-e: `withdraw` aksiyonu, WP action hook ile entegrasyon |
+| **Veri Saklama & İmha** | KVKK Md.7: Ortam bazlı saklama süreleri, otomatik periyodik imha |
+| **Çerez Duvarı Koruması** | KVK Kurul kararı: Cookie wall yasağı, compliance score denetimi |
 
 ---
 
@@ -158,6 +164,9 @@ add_filter('veribenim_consent_metadata', function($metadata) {
 - **Shortcode & Gutenberg Block** — `[veribenim_consent]` ve block editor desteği
 - **Caching Plugin Uyumluluğu** — WP Rocket, W3 Total Cache ile uyumlu
 - **Multisite Desteği** — Network activation ve site-bazlı yapılandırma
+- **Rıza Geri Çekme Hook** — `veribenim_consent_withdrawn` aksiyonu ile entegrasyon
+- **Rıza Yenileme** — 12 aylık zorunlu yenileme, banner otomatik tetikleme
+- **Çerez Duvarı Engeli Yok** — KVK Kurul kararına uygun, siteye erişim kısıtlanmaz
 
 ---
 
@@ -179,9 +188,20 @@ add_action('veribenim_before_load', function() { });
 // Consent kabul edildikten sonra
 add_action('veribenim_after_consent', function($preferences) { });
 
+// Rıza geri çekildiğinde (KVKK Md.11/1-e)
+add_action('veribenim_consent_withdrawn', function($session_id) {
+    // Kullanıcı verilerini işlemeyi durdur
+    error_log("Consent withdrawn for session: {$session_id}");
+});
+
+// Rıza yenileme gerektiğinde
+add_action('veribenim_renewal_required', function($session_id) {
+    // Banner'ı yeniden göster
+});
+
 // Custom kategoriler eklemek
 add_filter('veribenim_consent_categories', function($categories) {
-    $categories['custom'] = ['label' => 'Özel', 'description' => 'Açı'];
+    $categories['custom'] = ['label' => 'Özel', 'description' => 'Açıklama'];
     return $categories;
 });
 ```
@@ -206,10 +226,14 @@ POST /wp-json/veribenim/v1/consent
 
 ### KVKK Uyumluluğu
 
+- ✅ **Madde 5:** Kişisel verilerin işlenme şartları
 - ✅ **Madde 6:** Rızaya dayalı veri işleme
+- ✅ **Madde 7:** Kişisel verilerin silinmesi ve imhası (periyodik imha)
 - ✅ **Madde 10:** Veri sahibinin hakları
-- ✅ **Madde 13:** Aydınlatma yükümlülüğü
-- ✅ **Madde 14:** Veri güvenliği
+- ✅ **Madde 11/1-e:** Rızayı her zaman geri çekme hakkı
+- ✅ **Madde 12:** Veri güvenliği
+- ✅ **Madde 16:** VERBİS kaydı
+- ✅ **KVK Kurul Çerez Rehberi 2022:** Cookie wall yasağı, 12 aylık yenileme, ön işaretli kutu yasağı
 
 ### GDPR Uyumluluğu
 
