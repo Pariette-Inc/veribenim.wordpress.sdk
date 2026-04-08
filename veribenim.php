@@ -49,9 +49,10 @@ add_action('plugins_loaded', 'veribenim_init');
  */
 register_activation_hook(__FILE__, function () {
     add_option('veribenim_token', '');
+    add_option('veribenim_domain', '');
     add_option('veribenim_lang', 'tr');
     add_option('veribenim_api_url', 'https://live.veribenim.com');
-    add_option('veribenim_script_url', 'https://bundles.veribenim.com/bundle.js');
+    add_option('veribenim_script_url', '');
 });
 
 /**
