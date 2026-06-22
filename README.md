@@ -1,5 +1,7 @@
 # Veribenim WordPress SDK
 
+> ℹ️ **Kanonik kaynak:** Veribenim PHP SDK'ları artık tek bir monorepo'da toplanıyor: **`veribenim.php.sdk`** (`packages/wordpress`). Geliştirme orada sürer; bu repo onunla senkron tutulur. Yeni katkıları monorepo'ya gönderin.
+
 ![Veribenim Banner](https://veribenim.com/assets/banner.png)
 
 **Türkiye'nin En Kapsamlı WordPress Veri Gizliliği Çözümü | KVKK & GDPR Uyumlu**

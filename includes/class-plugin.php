@@ -22,6 +22,8 @@ class Veribenim_Plugin
             add_action('admin_menu', [$this->admin, 'add_menu_page']);
             add_action('admin_init', [$this->admin, 'register_settings']);
             add_action('admin_notices', [$this->admin, 'maybe_show_setup_notice']);
+            // AJAX: bağlantı testi — nonce doğrulamalı (class-admin.php handle_test_connection)
+            add_action('wp_ajax_veribenim_test_connection', [$this->admin, 'handle_test_connection']);
         }
 
         // Frontend
@@ -258,7 +260,13 @@ class Veribenim_Plugin
     {
         $successTitle   = esc_js($settings['success_title']   ?? __('Teşekkürler!', 'veribenim'));
         $successMessage = esc_js($settings['success_message'] ?? __('Formunuz başarıyla gönderildi.', 'veribenim'));
-        $redirectUrl    = esc_js($settings['redirect_url']    ?? '');
+
+        // Redirect URL — yalnızca http(s) protokolüne izin ver.
+        // javascript: veya data: URI'larını bloke et (open redirect + XSS koruması).
+        $rawRedirect = $settings['redirect_url'] ?? '';
+        $redirectUrl = (is_string($rawRedirect) && preg_match('/^https?:\/\//', $rawRedirect))
+            ? esc_js($rawRedirect)
+            : '';
 
         return <<<JS
 <script>
